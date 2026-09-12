@@ -126,10 +126,15 @@ command -v uvx >/dev/null 2>&1 && pass "uvx (used by adk deploy cloud_run)" \
 
 section "Python and ADK"
 
+# .venv is gitignored, so on a fresh clone it does not exist yet and pointing at
+# its activate script is advice that cannot be followed. Say which it is.
 if [[ -n "${VIRTUAL_ENV:-}" ]]; then
   pass "venv active: $(basename "$VIRTUAL_ENV")"
-else
+elif [[ -f "${SC_DIR:-.}/.venv/bin/activate" ]]; then
   warn "no virtualenv active" "Run: source .venv/bin/activate"
+else
+  warn "no virtualenv active, and no .venv in the repo" \
+       "python3 -m venv .venv && source .venv/bin/activate && pip install -r agent/requirements.txt"
 fi
 
 ADK_VER=$(python3 -c 'import importlib.metadata as m; print(m.version("google-adk"))' 2>/dev/null)
@@ -138,7 +143,21 @@ if [[ -n "$ADK_VER" ]]; then
   mkdir -p "$EVIDENCE_DIR" 2>/dev/null
   echo "$ADK_VER" > "$EVIDENCE_DIR/adk-version" 2>/dev/null
 else
-  fail "google-adk not importable" "pip install google-adk, or activate the venv"
+  fail "google-adk not importable" \
+       "pip install -r agent/requirements.txt (it pins the version), or activate the venv. See README Setup."
+fi
+
+# Lever C deploys with `adk deploy agent_engine`, which does `import vertexai`.
+# google-adk does not pull that in, so a venv built from agent/requirements.txt
+# alone satisfies every check above and then fails at the deploy. Lever-gated:
+# levers A and B never touch it.
+if want C; then
+  if python3 -c 'import vertexai' 2>/dev/null; then
+    pass "vertexai importable (needed by adk deploy agent_engine)"
+  else
+    fail "vertexai not importable, and lever C deploys through it" \
+         "pip install 'google-cloud-aiplatform[adk,agent_engines]==2.1.0'. See README Setup."
+  fi
 fi
 
 if command -v adk >/dev/null 2>&1; then
@@ -223,18 +242,34 @@ info "region $REGION, vertex $VERTEX_LOCATION, model $VERTEX_MODEL"
 section "Lever isolation"
 # Vertex bills at project level with no resource to label, so the project is the
 # only attribution boundary. Check the configured mapping, not the project name.
-declare -A LEVER_PROJECT=( [A]="$PROJECT_LEVER_A" [B]="$PROJECT_LEVER_B" [C]="$PROJECT_LEVER_C" )
+#
+# A case, not `declare -A`. Associative arrays need bash 4; stock macOS ships
+# 3.2.57 at /bin/bash, where the subscripts [A] [B] [C] are evaluated as
+# arithmetic and all collapse to index 0. Every lever then resolves to lever C's
+# project, so this gate reports "two or more levers share a project" on a correct
+# setup and "project mismatch, expected <lever C>" when you run lever A. That is
+# a confident wrong answer from the one check the whole experimental design rests
+# on -- the thing standing between you and lever B's spend landing in lever A's
+# billing rows.
+lever_project() {
+  case "$1" in
+    A) printf '%s' "${PROJECT_LEVER_A:-}" ;;
+    B) printf '%s' "${PROJECT_LEVER_B:-}" ;;
+    C) printf '%s' "${PROJECT_LEVER_C:-}" ;;
+    *) printf '%s' "" ;;
+  esac
+}
 
 UNSET_COUNT=0
 for L in A B C; do
-  if [[ -z "${LEVER_PROJECT[$L]}" ]]; then
+  if [[ -z "$(lever_project "$L")" ]]; then
     warn "PROJECT_LEVER_$L is not set" "Set it in env.local.sh before running lever $L."
     UNSET_COUNT=$((UNSET_COUNT+1))
   fi
 done
 
 if [[ $UNSET_COUNT -eq 0 ]]; then
-  DUPES=$(printf '%s\n' "${LEVER_PROJECT[@]}" | sort | uniq -d)
+  DUPES=$(printf '%s\n' "$(lever_project A)" "$(lever_project B)" "$(lever_project C)" | sort | uniq -d)
   if [[ -n "$DUPES" ]]; then
     fail "two or more levers share a project: $DUPES" \
          "Vertex spend cannot be separated. Give each lever its own project."
@@ -244,7 +279,7 @@ if [[ $UNSET_COUNT -eq 0 ]]; then
 fi
 
 if [[ "$LEVER" != "ALL" ]]; then
-  EXPECTED="${LEVER_PROJECT[$LEVER]}"
+  EXPECTED="$(lever_project "$LEVER")"
   if [[ -z "$EXPECTED" ]]; then
     warn "cannot verify project for lever $LEVER" "PROJECT_LEVER_$LEVER is unset."
   elif [[ "$PROJECT_ID" == "$EXPECTED" ]]; then
@@ -417,7 +452,12 @@ else
   VERTEX_HOST="${VERTEX_LOCATION}-aiplatform.googleapis.com"
 fi
 URL="https://${VERTEX_HOST}/v1/projects/${PROJECT_ID}/locations/${VERTEX_LOCATION}/publishers/google/models/${VERTEX_MODEL}:generateContent"
-CODE=$(curl -s -o /tmp/sc_vertex.json -w "%{http_code}" -X POST \
+# mktemp, not a fixed /tmp name: two preflights running at once would overwrite
+# each other's response, and a predictable path in a world-writable directory is
+# a symlink target on a shared machine.
+VERTEX_OUT=$(mktemp "${TMPDIR:-/tmp}/sc_vertex.XXXXXX")
+trap 'rm -f "$VERTEX_OUT"' EXIT
+CODE=$(curl -s -o "$VERTEX_OUT" -w "%{http_code}" -X POST \
   -H "Authorization: Bearer ${TOKEN:-}" -H "Content-Type: application/json" "$URL" \
   -d '{"contents":[{"role":"user","parts":[{"text":"hi"}]}],"generationConfig":{"maxOutputTokens":1}}' 2>/dev/null)
 case "$CODE" in
@@ -427,14 +467,14 @@ case "$CODE" in
            warn "$VERTEX_MODEL is a preview model" \
                 "Preview models often have no published list price. The whole comparison rests on one. Consider a GA model." ;;
        esac
-       T=$(jq -r '.usageMetadata.promptTokenCount // "?"' /tmp/sc_vertex.json 2>/dev/null)
+       T=$(jq -r '.usageMetadata.promptTokenCount // "?"' "$VERTEX_OUT" 2>/dev/null)
        info "usageMetadata present (promptTokenCount=$T), token capture will work" ;;
   403) fail "Vertex returned 403" "Check IAM on $PROJECT_ID." ;;
   404) fail "model $VERTEX_MODEL not found in $VERTEX_LOCATION" "Try another location or model id." ;;
   429) warn "Vertex returned 429" "Rate limited. Watch this during load tests." ;;
-  *)   fail "Vertex call returned HTTP $CODE" "$(jq -r '.error.message // "no message"' /tmp/sc_vertex.json 2>/dev/null)" ;;
+  *)   fail "Vertex call returned HTTP $CODE" "$(jq -r '.error.message // "no message"' "$VERTEX_OUT" 2>/dev/null)" ;;
 esac
-rm -f /tmp/sc_vertex.json
+rm -f "$VERTEX_OUT"; trap - EXIT
 
 section "Cloud Run"
 if gcloud run services describe "$SERVICE_NAME" --region="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then

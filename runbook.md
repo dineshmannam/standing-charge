@@ -323,18 +323,28 @@ mark compaction done
 Nothing else changes. Not the prompt, not the count, not the model, not the
 time of day if you can help it.
 
-## B.3 Capture tokens from traces
+## B.3 Capture tokens
 
 `[NEW]` The codelab has you observe that session token counts exceed the model's
 million-token context limit. That observation is your data.
 
+Token counts come from `loadgen.py`, which reads `usageMetadata` off each
+response and writes `prompt_tokens`, `completion_tokens`, `thoughts_tokens` and
+`total_tokens` as columns in `evidence/load-B-*.csv`. Every lever B number in
+`findings.md` (F17) is computed from those columns. Nothing further is needed.
+
+Cloud Trace is the other route. It was tried and it is not what the published
+numbers rest on:
+
 ```bash
-gcloud trace list --project="$PROJECT_ID" \
-  --format=json > evidence/traces-B-${RUN_ID}.json
+# Tried, not used. Returned an empty result on the lever B run, so the artifact
+# it wrote is not published. Left here because it is the obvious thing to reach
+# for, and because you may have tracing configured where this run did not.
+gcloud trace list --project="$PROJECT_ID" --format=json > evidence/traces-B-${RUN_ID}.json
 ```
 
-Pull per-invocation prompt and completion token counts from the ADK spans. Cross
-check against the Usage view in Agent Observability.
+If you want a second source for the token counts, cross check the CSV columns
+against the Usage view in Agent Observability.
 
 The cost story: compaction spends tokens summarising in order to save tokens on
 subsequent turns. **It is not automatically cheaper.** Whether it pays depends on
@@ -354,6 +364,15 @@ valid if the agent is identical.
 ```bash
 source env.sh C
 ./preflight.sh C
+```
+
+`[NEW]` Lever C needs one package the other two do not. `adk deploy agent_engine`
+does `import vertexai`, and `google-adk` does not pull it in, so a venv built from
+`agent/requirements.txt` alone passes every other check and then fails at the
+deploy. `./preflight.sh C` now catches this; install it first:
+
+```bash
+pip install 'google-cloud-aiplatform[adk,agent_engines]==2.1.0'
 ```
 
 Deploy the same agent code to Cloud Run and to Agent Runtime. Same model, same

@@ -220,9 +220,18 @@ hist_hits=""
 for rev in $(git rev-list --all 2>/dev/null); do
   # Match on content so the published placeholder can be filtered out, then
   # reduce to rev:path. Filtering on filenames alone could not tell them apart.
+  # Placeholder exclusions, each naming one exact permitted value. A value the
+  # tip checks deliberately permit must not be reported here as a historical
+  # leak, or the warning fires forever on a clean repo and stops being read.
+  #
+  # Name the literal, never a loose word. Filtering on 'example' would drop any
+  # line that merely uses the word, so a genuine identifier sitting in a
+  # sentence about an example would vanish silently - the one failure mode this
+  # whole section exists to prevent. -F keeps the dots literal.
   h=$(git grep -nE "$HIST_SHAPES" "$rev" -- 2>/dev/null \
       | grep -v '012345-6789AB-CDEF01' \
       | grep -vE 'projects/PROJECT_NUMBER/' \
+      | grep -vF 'example-uc.a.run.app' \
       | cut -d: -f1-2)
   [[ -n "$h" ]] && hist_hits+="$h"$'\n'
 done

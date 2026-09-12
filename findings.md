@@ -1,11 +1,14 @@
 # Findings
 
-Raw material for the script and the posts. One entry per finding.
+One entry per finding, written as the measurements came in.
 
 Each has a **status**: `confirmed` (measured, reproducible), `provisional`
-(seen once, needs the real sweep), or `open` (a question to answer).
+(seen once, not re-run) or `open` (a question the run window did not answer).
 
-Nothing here is a conclusion until it survives Thursday and Friday's data.
+Data collection ran 2 to 5 September 2026 and is closed. These statuses are the
+ones the study ended with, not a snapshot mid-run. The open questions at the
+bottom stayed open; they are listed rather than deleted because what a
+measurement study did not get to is part of its result.
 
 ---
 
@@ -780,22 +783,24 @@ it changes what the absolute numbers mean.
 
 ## Open questions
 
-| # | Question | Resolve by |
+Status at close of the run window, 5 September 2026.
+
+| # | Question | Where it ended |
 |---|---|---|
-| ~~Q1~~ | ~~Does Vertex bill thinking tokens at the output rate?~~ | **RESOLVED 3 Sep. Yes. The pricing row is literally named "Text output (response and reasoning)". $2.50/1M for 2.5 Flash.** |
-| ~~Q2~~ | ~~Does the 6x thinking variance hold at n=120?~~ | **RESOLVED 3 Sep. Yes, and it widened to 8.3x.** |
-| Q3 | Where is the lever A crossover, if there is one in range? | Friday |
-| ~~Q4~~ | ~~Does FOCUS reconcile against the detailed export?~~ | **RESOLVED 5 Sep. No, and the reason is free-tier credits. See F18.** |
-| ~~Q5~~ | ~~Does compaction actually save money, or spend more?~~ | **RESOLVED 4 Sep. It never fires at this scale. 0.74% difference across 120 turns, within thinking-token noise.** |
-| Q14 | At what conversation length does compaction begin to engage? | Separate experiment, needs a much longer session |
-| Q12 | Would a persistent session service change lever B's cost? Sessions become storage rather than RAM. | Out of scope, note it |
-| Q6 | Does Agent Engine carry a cost premium? | Lever C, Agent Engine arm |
-| Q13 | Does the streaming-only surface change measured latency against Cloud Run's request/response? Latency now includes consuming the whole stream. | Compare the two lever C arms |
-| Q7 | Was request 6's 9,324ms a second instance starting? | `run.googleapis.com/container/startup_latencies` for that minute |
-| Q9 | Do cold starts pulled from server metrics agree with the latency proxy? | Thursday, compare both |
-| Q8 | How does the project appear in the FOCUS schema? | One SELECT |
-| Q10 | Do billing rows for run-2026-09-02-a appear once export catches up? | Thursday morning, `postflight --billing` |
-| Q11 | What did the filmdemo run actually cost? Ten agent invocations, hosting plus model. | Once Q10 resolves |
+| ~~Q1~~ | ~~Does Vertex bill thinking tokens at the output rate?~~ | **Resolved 3 Sep. Yes. The pricing row is literally named "Text output (response and reasoning)". $2.50/1M for 2.5 Flash.** |
+| ~~Q2~~ | ~~Does the 6x thinking variance hold at n=120?~~ | **Resolved 3 Sep. Yes, and it widened to 8.3x.** |
+| ~~Q4~~ | ~~Does FOCUS reconcile against the detailed export?~~ | **Resolved 5 Sep. No, and the reason is free-tier credits. See F18.** |
+| ~~Q5~~ | ~~Does compaction actually save money, or spend more?~~ | **Resolved 4 Sep. It never fires at this scale. 0.74% difference across 120 turns, within thinking-token noise.** |
+| Q3 | Where is the lever A crossover, if there is one in range? | **Open.** The sweep ran: six lever A runs, min-instances 0 and 1 across steady, bursty and sparse (`evidence/load-A-*min0-*.csv`, `*min1-*.csv`), and F18 gives the cost either side. Fitting a crossover rate to those six points is analysis this study did not do. |
+| Q6 | Does Agent Engine carry a cost premium? | **Open, and reframed.** Both lever C arms ran (`evidence/load-C-*`), but F16 is explicit that the question was never reached: the two hosts turned out not to be interchangeable, which makes "which is cheaper" the wrong comparison to lead with. The per-invocation figures were not computed. |
+| Q7 | Was request 6's 9,324ms a second instance starting? | **Open.** Answerable from `run.googleapis.com/container/startup_latencies` for that minute; no server-metric artifact was captured, so the evidence here cannot settle it. |
+| Q8 | How does the project appear in the FOCUS schema? | **Open.** One SELECT against the FOCUS table. F18 queried it by `ServiceName` only. |
+| Q9 | Do cold starts pulled from server metrics agree with the latency proxy? | **Open.** Same gap as Q7: `evidence/` holds client-side latency only. F3 already says the proxy cannot reliably detect a cold start, so this would have tested F3 rather than extended it. |
+| Q10 | Do billing rows for run-2026-09-02-a appear once export catches up? | **Open.** `postflight.sh --billing` is the check; no billing-row artifact for that run is in `evidence/`. |
+| Q11 | What did the filmdemo run actually cost? Ten agent invocations, hosting plus model. | **Open.** Needs Q10 first. Note F18: at this scale the Cloud Run half would be free-tier absorbed either way. |
+| Q12 | Would a persistent session service change lever B's cost? Sessions become storage rather than RAM. | **Out of scope**, recorded deliberately. |
+| Q13 | Does the streaming-only surface change measured latency against Cloud Run's request/response? Latency now includes consuming the whole stream. | **Open.** Both lever C arms were run (`evidence/load-C-*`); the latency comparison between them was not made. |
+| Q14 | At what conversation length does compaction begin to engage? | **Out of scope.** A separate experiment: needs a session far longer than the 120 turns of F17. |
 
 ---
 

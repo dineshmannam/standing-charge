@@ -25,3 +25,6 @@ evidence/agent-engine-C
 # Video production material. Working notes, not published output.
 filmday.md
 script.md
+
+# Agent tool state. Local to whoever cloned this, not part of the study.
+.claude/

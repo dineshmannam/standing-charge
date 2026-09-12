@@ -424,8 +424,13 @@ def main():
                 time.sleep(wait)
             drift_ms = int((time.time() - due) * 1000)
             if drift_ms > 60000:
+                # caffeinate is macOS-only; systemd-inhibit is the Linux
+                # equivalent. Name whichever one this machine actually has,
+                # because a hint for the wrong OS is not a hint.
+                inhibit = ("caffeinate -dimsu" if sys.platform == "darwin"
+                           else "systemd-inhibit --what=idle:sleep")
                 print(f"    [WARNING {drift_ms/1000:.0f}s behind schedule. "
-                      f"Did the machine sleep? Use: caffeinate -dimsu python3 loadgen.py ...]",
+                      f"Did the machine sleep? Use: {inhibit} python3 loadgen.py ...]",
                       flush=True)
 
             session = shared_session

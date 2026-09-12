@@ -36,3 +36,23 @@ runsh() {
 }
 
 pause() { printf "\n  %s%s%s\n" "$YELLOW" "${1:-pause}" "$RESET"; read -rp "  [Enter to continue] " _; }
+
+# Keep the machine awake for the duration of a command, on whatever OS this is.
+#
+# F12: the Mac slept for 368s mid-run, drifting the schedule past the identity
+# token's one hour expiry. That produces a silent hole -- no error, no retry,
+# just an absence you only see as drift. An unattended hour needs a sleep
+# inhibitor. `caffeinate` is macOS-only; the Linux equivalent is
+# `systemd-inhibit`. On anything else, say so rather than failing with
+# "command not found" on the documented run path.
+nosleep() {
+  if command -v caffeinate >/dev/null 2>&1; then
+    caffeinate -dimsu "$@"
+  elif command -v systemd-inhibit >/dev/null 2>&1; then
+    systemd-inhibit --what=idle:sleep --why="standing-charge load run" "$@"
+  else
+    printf "  %sno sleep inhibitor (caffeinate/systemd-inhibit) found.%s\n" "$YELLOW" "$RESET"
+    printf "  %sIf this machine sleeps mid-run the schedule drifts past the token expiry (F12).%s\n" "$YELLOW" "$RESET"
+    "$@"
+  fi
+}
