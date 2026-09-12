@@ -1,0 +1,6 @@
+run_id,lever,profile,seq,utc_time,status,latency_ms,prompt_tokens,completion_tokens,thoughts_tokens,total_tokens,model_version,traffic_type,session_mode,scheduled_offset_s,drift_ms,cold_hint
+run-2026-09-04-b-nocompaction,A,steady,0,2026-09-04T14:25:00Z,200,4685,47,86,253,386,gemini-2.5-flash,ON_DEMAND,same,0.0,1,first
+run-2026-09-04-b-nocompaction,A,steady,1,2026-09-04T14:25:27Z,200,1209,154,86,23,263,gemini-2.5-flash,ON_DEMAND,same,30.0,1,
+run-2026-09-04-b-nocompaction,A,steady,2,2026-09-04T14:25:57Z,200,1032,261,86,20,367,gemini-2.5-flash,ON_DEMAND,same,60.0,5,
+run-2026-09-04-b-nocompaction,A,steady,3,2026-09-04T14:26:27Z,200,1296,368,86,42,496,gemini-2.5-flash,ON_DEMAND,same,90.0,0,
+run-2026-09-04-b-nocompaction,A,steady,4,2026-09-04T14:26:57Z,200,1028,475,86,19,580,gemini-2.5-flash,ON_DEMAND,same,120.0,2,

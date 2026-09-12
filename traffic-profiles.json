@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "created": "2026-09-01",
+  "notes": "Frozen. Do not edit between runs. Additions go in a v1.1 file. steady and bursty deliver the same total invocations (120) so the only variable is arrival shape.",
+  "profiles": [
+    {
+      "id": "steady",
+      "description": "Constant rate. The case min-instances should win.",
+      "shape": "constant",
+      "requests_per_hour": 120,
+      "duration_minutes": 60
+    },
+    {
+      "id": "bursty",
+      "description": "Idle, then a spike. Same total volume as steady, so any cost difference is shape, not traffic. Cold starts bite here.",
+      "shape": "burst",
+      "requests_per_hour": 120,
+      "duration_minutes": 60,
+      "burst": {
+        "idle_minutes": 10,
+        "active_minutes": 5,
+        "active_rate_per_hour": 360
+      }
+    },
+    {
+      "id": "sparse",
+      "description": "A few requests an hour. Scale to zero should dominate. Volume deliberately differs, so compare cost per invocation, never total cost.",
+      "shape": "constant",
+      "requests_per_hour": 6,
+      "duration_minutes": 60
+    },
+    {
+      "id": "filmdemo",
+      "description": "On camera only. Short, visible, not for analysis. Excluded from the cost dataset.",
+      "shape": "constant",
+      "requests_per_hour": 120,
+      "duration_minutes": 5
+    }
+  ],
+  "prompt": "Summarise in three sentences why serverless platforms bill for idle capacity when a minimum instance count is set."
+}

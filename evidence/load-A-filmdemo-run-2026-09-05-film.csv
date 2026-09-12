@@ -1,0 +1,11 @@
+run_id,lever,profile,seq,utc_time,status,latency_ms,prompt_tokens,completion_tokens,thoughts_tokens,total_tokens,model_version,traffic_type,session_mode,scheduled_offset_s,drift_ms,cold_hint
+run-2026-09-05-film,A,filmdemo,0,2026-09-05T13:23:13Z,200,4682,47,83,165,295,gemini-2.5-flash,ON_DEMAND,fresh,0.0,0,first
+run-2026-09-05-film,A,filmdemo,1,2026-09-05T13:23:41Z,200,3111,47,82,279,408,gemini-2.5-flash,ON_DEMAND,fresh,30.0,0,
+run-2026-09-05-film,A,filmdemo,2,2026-09-05T13:24:11Z,200,3048,47,95,289,431,gemini-2.5-flash,ON_DEMAND,fresh,60.0,3,
+run-2026-09-05-film,A,filmdemo,3,2026-09-05T13:24:41Z,200,2771,47,84,169,300,gemini-2.5-flash,ON_DEMAND,fresh,90.0,5,
+run-2026-09-05-film,A,filmdemo,4,2026-09-05T13:25:13Z,200,4570,47,96,311,454,gemini-2.5-flash,ON_DEMAND,fresh,120.0,1,
+run-2026-09-05-film,A,filmdemo,5,2026-09-05T13:25:42Z,200,3759,47,81,184,312,gemini-2.5-flash,ON_DEMAND,fresh,150.0,5,
+run-2026-09-05-film,A,filmdemo,6,2026-09-05T13:26:11Z,200,2981,47,84,319,450,gemini-2.5-flash,ON_DEMAND,fresh,180.0,1,
+run-2026-09-05-film,A,filmdemo,7,2026-09-05T13:26:45Z,200,6536,47,85,740,872,gemini-2.5-flash,ON_DEMAND,fresh,210.0,4,
+run-2026-09-05-film,A,filmdemo,8,2026-09-05T13:27:12Z,200,3191,47,63,308,418,gemini-2.5-flash,ON_DEMAND,fresh,240.0,0,
+run-2026-09-05-film,A,filmdemo,9,2026-09-05T13:27:43Z,200,4560,47,76,448,571,gemini-2.5-flash,ON_DEMAND,fresh,270.0,5,

@@ -1,0 +1,14 @@
+# Only the agent should reach Cloud Build. Nothing else.
+../
+evidence/
+queries/
+docs/
+steps/
+*.csv
+*.md
+env.local.sh
+.hf_token
+*.token
+.venv/
+__pycache__/
+*.pyc

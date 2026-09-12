@@ -1,0 +1,7 @@
+run_id,lever,profile,seq,utc_time,status,latency_ms,prompt_tokens,completion_tokens,thoughts_tokens,total_tokens,model_version,traffic_type,session_mode,scheduled_offset_s,drift_ms,cold_hint
+run-2026-09-04-min1-sparse,A,sparse,0,2026-09-04T13:29:53Z,200,2528,47,92,132,271,gemini-2.5-flash,ON_DEMAND,fresh,0.0,1,first
+run-2026-09-04-min1-sparse,A,sparse,1,2026-09-04T13:39:58Z,200,7056,47,77,882,1006,gemini-2.5-flash,ON_DEMAND,fresh,600.0,5,
+run-2026-09-04-min1-sparse,A,sparse,2,2026-09-04T13:49:54Z,200,3348,47,104,305,456,gemini-2.5-flash,ON_DEMAND,fresh,1200.0,10,
+run-2026-09-04-min1-sparse,A,sparse,3,2026-09-04T13:59:56Z,200,5219,47,92,341,480,gemini-2.5-flash,ON_DEMAND,fresh,1800.0,10,
+run-2026-09-04-min1-sparse,A,sparse,4,2026-09-04T14:09:54Z,200,3472,47,92,249,388,gemini-2.5-flash,ON_DEMAND,fresh,2400.0,10,
+run-2026-09-04-min1-sparse,A,sparse,5,2026-09-04T14:19:54Z,200,3223,47,96,178,321,gemini-2.5-flash,ON_DEMAND,fresh,3000.0,10,

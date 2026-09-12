@@ -1,0 +1,11 @@
+run_id,lever,profile,seq,utc_time,status,latency_ms,prompt_tokens,completion_tokens,thoughts_tokens,total_tokens,model_version,traffic_type,session_mode,scheduled_offset_s,drift_ms,cold_hint
+run-2026-09-04-c-agentruntime,C,filmdemo,0,2026-09-04T20:37:42Z,200,5757,47,96,240,383,,,fresh,0.0,1,first
+run-2026-09-04-c-agentruntime,C,filmdemo,1,2026-09-04T20:38:11Z,200,5196,47,93,323,463,,,fresh,30.0,3,
+run-2026-09-04-c-agentruntime,C,filmdemo,2,2026-09-04T20:38:41Z,200,4398,47,101,237,385,,,fresh,60.0,1,
+run-2026-09-04-c-agentruntime,C,filmdemo,3,2026-09-04T20:39:10Z,200,3759,47,84,183,314,,,fresh,90.0,4,
+run-2026-09-04-c-agentruntime,C,filmdemo,4,2026-09-04T20:39:41Z,200,4941,47,89,303,439,,,fresh,120.0,4,
+run-2026-09-04-c-agentruntime,C,filmdemo,5,2026-09-04T20:40:11Z,200,4552,47,89,292,428,,,fresh,150.0,5,
+run-2026-09-04-c-agentruntime,C,filmdemo,6,2026-09-04T20:40:42Z,200,6014,47,84,287,418,,,fresh,180.0,1,
+run-2026-09-04-c-agentruntime,C,filmdemo,7,2026-09-04T20:41:11Z,200,4525,47,95,295,437,,,fresh,210.0,5,
+run-2026-09-04-c-agentruntime,C,filmdemo,8,2026-09-04T20:41:41Z,200,4265,47,92,194,333,,,fresh,240.0,1,
+run-2026-09-04-c-agentruntime,C,filmdemo,9,2026-09-04T20:42:12Z,200,5214,47,86,382,515,,,fresh,270.0,5,
