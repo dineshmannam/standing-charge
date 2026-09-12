@@ -6,6 +6,9 @@ A standing charge is the line on a utility bill you pay just for being
 connected, before you have used anything. This project measures the standing
 charges hiding in a Cloud Run plus Vertex AI agent deployment.
 
+This repository is the companion to the video
+[What an AI agent actually costs: 1,112 requests, measured from the bill](https://youtu.be/vMDJLKQd2ng).
+
 ## The three levers
 
 | Lever | Question | Codelab |
