@@ -28,10 +28,13 @@ scheduled_offset_s:FLOAT,drift_ms:INTEGER,cold_hint:STRING"
 EXPECTED_COLS=17
 
 # Runs that must never enter the cost dataset.
-# load-A-steady-run-2026-09-04-b-nocompaction.csv is the failed lever B attempt:
-# 116 of 120 requests returned 404 after the in-memory session vanished. It also
-# carries a lever A prefix because the shell was still on lever A when it ran,
-# which is the zsh `LEVER=B source env.sh` bug (F13).
+# load-A-steady-run-2026-09-04-b-nocompaction.csv is the aborted start of the
+# lever B nocompaction run: 5 requests, all 200, killed after two minutes. Its
+# prompt tokens grow 47/154/261/368/475 at session_mode=same, which is a
+# conversation and so lever B; lever A sends the same 47-token prompt fresh every
+# time. It carries a lever A prefix because the shell was still on lever A when
+# it ran, which is the zsh `LEVER=B source env.sh` bug (F13). Loading it would
+# file five lever B requests under lever A. See decisions.md.
 EXCLUDE=(
   "load-A-steady-run-2026-09-04-b-nocompaction.csv"
 )

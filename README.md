@@ -7,7 +7,8 @@ connected, before you have used anything. This project measures the standing
 charges hiding in a Cloud Run plus Vertex AI agent deployment.
 
 This repository is the companion to the video
-[What an AI agent actually costs: 1,112 requests, measured from the bill](https://youtu.be/vMDJLKQd2ng).
+[What an AI agent actually costs: 1,112 requests, measured from the bill](https://youtu.be/vMDJLKQd2ng)
+and the write-up [What an AI agent actually costs on Google Cloud](https://dineshmannam.com/engineering/what-an-ai-agent-actually-costs-on-google-cloud/).
 
 ## The three levers
 
